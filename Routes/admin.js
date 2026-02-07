@@ -12,17 +12,17 @@ const { adminModel } = require("../db");
             msg: "Endpoint"
         })
     })
-    adminRouter.post("/courses", function (req, res) {
+    adminRouter.post("/", function (req, res) {
         res.json({
             msg: "Endpoint"
         })
     })
-    adminRouter.put("/courses", function (req, res) {
+    adminRouter.put("/", function (req, res) {
         res.json({
             msg: "Endpoint"
         })
     })
-    adminRouter.get("/courses/bulk", function (req, res) {
+    adminRouter.get("/bulk", function (req, res) {
         res.json({
             msg: "Endpoint"
         })
