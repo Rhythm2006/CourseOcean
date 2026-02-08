@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken")
 const { userModel } = require("../db");
 const dotenv = require("dotenv")
 dotenv.config()
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET_USER;
 
 
     usersRouter.post("/signup", async function (req, res) {
@@ -70,13 +70,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
             return
         } 
 
-        
-
         const passwordMatch = await bcrypt.compare(password,user.password)
 
         if(passwordMatch){
             const token = jwt.sign({
-                userId: user._id.toString()
+                userId: user._id
             },JWT_SECRET);
             res.json({
                 message: `${token}`

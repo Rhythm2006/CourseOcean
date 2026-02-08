@@ -1,12 +1,14 @@
 const { Router } = require("express");
 const adminRouter = Router()
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
 const { adminModel } = require("../db");
-const { z } = require("zod")
-const dotenv = require("dotenv")
-dotenv.config()
-const JWT_SECRET = process.env.JWT_SECRET;
+const { courseModel } = require("../db")
+const { z } = require("zod");
+const dotenv = require("dotenv");
+dotenv.config();
+const { adminMiddleware } = require("../middleware/admin");
+const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
     adminRouter.post("/signup", async function (req, res) {
         const requiredBody = z.object({
                     email: z.string().email(),
@@ -70,7 +72,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
         
                 if(passwordMatch){
                     const token = jwt.sign({
-                        adminId: admin._id.toString()
+                        adminId: admin._id
                     },JWT_SECRET);
                     res.json({
                         message: `${token}`
@@ -81,9 +83,21 @@ const JWT_SECRET = process.env.JWT_SECRET;
                     })
                 }
     })
-    adminRouter.post("/course", function (req, res) {
+    adminRouter.post("/course",adminMiddleware, async function (req, res) {
+
+        const adminId = req.adminId;
+        const {title,description,imageUrl,price} = req.body;
+
+        const course = await courseModel.create({
+            title:title,
+            description:description,
+            imageUrl:imageUrl,
+            price:price
+        })
+
         res.json({
-            msg: "Endpoint"
+            message: "Course Created",
+            courseId: course._id
         })
     })
     adminRouter.put("/course", function (req, res) {
