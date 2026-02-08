@@ -100,9 +100,22 @@ const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
             courseId: course._id
         })
     })
-    adminRouter.put("/course", function (req, res) {
+    adminRouter.put("/course", async function (req, res) {
+        const adminId = req.adminId;
+        const {title,description,imageUrl,price,courseId} = req.body;
+
+        const course = await courseModel.updateOne({
+            _id: courseId
+        },{
+            title:title,
+            description:description,
+            imageUrl:imageUrl,
+            price:price
+        })
+
         res.json({
-            msg: "Endpoint"
+            message: "Course Updated",
+            courseId: course._id
         })
     })
     adminRouter.get("/course/bulk", function (req, res) {
