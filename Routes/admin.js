@@ -8,6 +8,7 @@ const { z } = require("zod");
 const dotenv = require("dotenv");
 dotenv.config();
 const { adminMiddleware } = require("../middleware/admin");
+const { coursesRouter } = require("./course");
 const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
     adminRouter.post("/signup", async function (req, res) {
         const requiredBody = z.object({
@@ -56,7 +57,7 @@ const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
 
     adminRouter.post("/signin", async function (req, res) {
         const email = req.body.email;
-                const passsword = req.body.password;
+        const passsword = req.body.password;
         
                 const admin = await adminModel.findOne({
                     email: email
@@ -92,7 +93,8 @@ const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
             title:title,
             description:description,
             imageUrl:imageUrl,
-            price:price
+            price:price,
+            creatorId: adminId
         })
 
         res.json({
@@ -100,12 +102,14 @@ const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
             courseId: course._id
         })
     })
-    adminRouter.put("/course", async function (req, res) {
+    adminRouter.put("/course",adminMiddleware, async function (req, res) {
         const adminId = req.adminId;
+        // Need to check whether the courseId belongs to the admin himself or Not, or some other admin sending the request
         const {title,description,imageUrl,price,courseId} = req.body;
 
         const course = await courseModel.updateOne({
-            _id: courseId
+            _id: courseId,
+            creatorId: adminId
         },{
             title:title,
             description:description,
@@ -118,9 +122,13 @@ const JWT_SECRET = process.env.JWT_SECRET_ADMIN;
             courseId: course._id
         })
     })
-    adminRouter.get("/course/bulk", function (req, res) {
+    adminRouter.get("/course/bulk",adminMiddleware,async function (req, res) {
+        const creatorId = req.adminId;
+        const courses = await courseModel.find({
+            creatorId
+        })
         res.json({
-            msg: "Endpoint"
+            courses
         })
     })
 
